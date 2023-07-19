@@ -4,6 +4,8 @@ import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
+import android.os.Bundle; // react navigation 추가
+
 
 public class MainActivity extends ReactActivity {
 
@@ -14,6 +16,12 @@ public class MainActivity extends ReactActivity {
   @Override
   protected String getMainComponentName() {
     return "FoodDeliveryApp";
+  }
+
+  // react navigation 추가
+  @Override
+  protected void onCreate(Bundle savedInstanseState) {
+    super.onCreate(null);
   }
 
   /**

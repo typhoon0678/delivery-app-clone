@@ -1,118 +1,68 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import * as React from 'react';
+import { NavigationContainer, ParamListBase } from '@react-navigation/native';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  createNativeStackNavigator,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
+import { Pressable, Text, TouchableHighlight, View } from 'react-native';
+import { useCallback } from 'react';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+type RootStackParamList = { // 페이지 목록
+  Home: undefined; // Page의 Parameter가 없음(undefined)
+  Details: undefined;
+};
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type DetailsScreenProps = NativeStackScreenProps<ParamListBase, 'Details'>;
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+function HomeScreen({ navigation }: HomeScreenProps) {
+  const onClick = useCallback(() => {
+    navigation.navigate('Details');
+  }, [navigation]);
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <>
+    <View style={{ flex: 1, backgroundColor: 'yellow', alignItems: 'center', justifyContent: 'center' }}>
+      <Pressable onPress={onClick} style={{paddingHorizontal:40, paddingVertical:20}}>
+        <Text style={{color: 'black', fontWeight: 'bold', fontSize:24}}>Home Screen</Text>
+      </Pressable>
+    </View>
+    <View style={{flex: 2, backgroundColor: 'orange', alignItems: 'baseline', justifyContent: 'flex-start'}}>
+      <Text>Second</Text>
+    </View>
+    </>
+  );
+}
+
+function DetailsScreen({ navigation }: DetailsScreenProps) {
+  const onClick = useCallback(() => {
+    navigation.navigate('Home');
+  }, [navigation]);
+
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <Pressable onPress={onClick}>
+        <Text>Details Screen</Text>
+      </Pressable>
     </View>
   );
 }
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+const Stack = createNativeStackNavigator<RootStackParamList>();
+function App() {
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ title: 'Overview' }}
+        />
+        <Stack.Screen name="Details">
+          {props => <DetailsScreen {...props} />}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
