@@ -1,12 +1,19 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useRef, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import DismissKeyboardView from "../components/DismissKeyboardView";
 import { RootStackParamList } from "../../AppInner";
+import { useAppDispatch } from "../store";
+import Config from "react-native-config";
+import axios, { AxiosError, AxiosResponse } from "axios";
+import userSlice from "../slices/user";
+import EncryptedStorage from "react-native-encrypted-storage";
 
 type SignInScreenProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
 function SignIn({ navigation }: SignInScreenProps) {
+    const dispatch = useAppDispatch();
+    const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const emailRef = useRef<TextInput | null>(null);
@@ -20,14 +27,41 @@ function SignIn({ navigation }: SignInScreenProps) {
         setPassword(text);
     }, []);
 
-    const onSubmit = useCallback(() => {
+    const onSubmit = useCallback(async () => {
+        if (loading) {
+            return;
+        }
         if (!email || !email.trim()) {
             Alert.alert('알림', '이메일을 다시 입력해주세요.');
         }
         if (!password || !password.trim()) {
             Alert.alert('알림', '비밀번호를 다시 입력해주세요.');
         }
-    }, []);
+        try {
+            setLoading(true);
+            const response = await axios.post(`${Config.API_URL}/login`, { email, password });
+            console.log(response.data);
+            Alert.alert('알림', '로그인 되었습니다.');
+            dispatch(
+                userSlice.actions.setUser({
+                    name: response.data.data.name,
+                    email: response.data.data.email,
+                    accessToken: response.data.data.accessToken,
+                }),
+            );
+            await EncryptedStorage.setItem(
+                'refreshToken',
+                response.data.data.refreshToken,
+            );
+        } catch (error) {
+            const errorResponse = (error as AxiosError).response;
+            if (errorResponse) {
+                Alert.alert('알림', (errorResponse as AxiosResponse).data.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }, [loading, dispatch, email, password]);
 
     const toSignUp = useCallback(() => {
         navigation.navigate('SignUp');
@@ -67,13 +101,17 @@ function SignIn({ navigation }: SignInScreenProps) {
                 onSubmitEditing={onSubmit} /></View>
         <View style={styles.buttonZone}>
             <Pressable
-                onPress={onSubmit}
                 style={
                     canGoNext
                         ? styles.loginButton
                         : [styles.loginButton, styles.loginButtonActive]}
-                disabled={canGoNext}>
-                <Text style={styles.loginButtonText}>로그인</Text>
+                disabled={!canGoNext || loading}
+                onPress={onSubmit}>
+                {loading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={styles.loginButtonText}>로그인</Text>
+                )}
             </Pressable>
             <Pressable onPress={toSignUp} style={[styles.loginButton, styles.loginButtonActive]}>
                 <Text style={styles.loginButtonText}>회원가입하기</Text>
