@@ -1,8 +1,8 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useCallback, useRef, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { RootStackParamList } from "../../App";
 import DismissKeyboardView from "../components/DismissKeyboardView";
+import { RootStackParamList } from "../../AppInner";
 
 type SignInScreenProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
@@ -58,6 +58,7 @@ function SignIn({ navigation }: SignInScreenProps) {
             <TextInput
                 placeholder="비밀번호를 입력해주세요"
                 onChangeText={onChangePassword}
+                style={styles.textInput}
                 secureTextEntry
                 importantForAutofill="yes"
                 autoComplete="password"
