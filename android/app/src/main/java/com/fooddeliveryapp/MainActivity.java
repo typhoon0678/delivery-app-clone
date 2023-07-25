@@ -5,6 +5,7 @@ import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
 import android.os.Bundle; // react navigation 추가
+import org.devio.rn.splashscreen.SplashScreen; // splash screen 추가
 
 
 public class MainActivity extends ReactActivity {
@@ -18,10 +19,10 @@ public class MainActivity extends ReactActivity {
     return "FoodDeliveryApp";
   }
 
-  // react navigation 추가
   @Override
   protected void onCreate(Bundle savedInstanseState) {
-    super.onCreate(null);
+    SplashScreen.show(this); // splash screen 추가
+    super.onCreate(null); // react navigation 추가
   }
 
   /**
